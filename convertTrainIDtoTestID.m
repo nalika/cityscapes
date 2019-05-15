@@ -12,17 +12,26 @@ trainID = [1:19]
 
 base_dir = '<PATH_TO_SEGMENTATION>';
 all_names = dir(base_dir);
+
+
 for i=3:length(all_names)
     fileName = all_names(i).name;
-    img = imread(strcat(base_dir, fileName)); % read image
+    img = imread(strcat(base_dir, fileName)); % read image % imshow(img)
+    img_fix_testID = img;
+    txt = '';
     
     %% replace trainID by testID
-    for trID=1:numel(trainID)
+    for trID=trainID
         % Finding the index of labels
-        pos = find(img == trainID(trID));
-        img(pos) = testID(trID);     
+        pos = find(img == trID);
+        img_fix_testID(pos) = testID(trID);   
+        txt = strcat(txt, sprintf('Replacing %d -> %d; ', trID, testID(trID)));
+        disp(txt)
     end
-    % Write image to graphics file. 
-    imwrite(img,strcat(base_dir, fileName))   
     
+    % Write image to graphics file. 
+    fileName_new = strrep(fileName,'val',''); 
+    fileName_new = strrep(fileName_new,'gtFine','predict');
+    imwrite(uint8(img_fix_testID),strcat(base_dir, fileName_new))   
+    delete (strcat(base_dir, fileName))
 end 
